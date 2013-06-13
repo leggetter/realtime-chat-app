@@ -1,0 +1,291 @@
+﻿<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <link rel="stylesheet" type="text/css" href="css/phone.css" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <meta name="msapplication-tap-highlight" content="no" />
+
+    <link rel="stylesheet" type="text/css" href="lib/bootmetro-0.6.0/content/css/bootstrap.css">
+    <link rel="stylesheet" type="text/css" href="lib/bootmetro-0.6.0/content/css/bootstrap-responsive.css">
+    <link rel="stylesheet" type="text/css" href="lib/bootmetro-0.6.0/content/css/bootmetro.css">
+    <link rel="stylesheet" type="text/css" href="lib/bootmetro-0.6.0/content/css/bootmetro-tiles.css">
+    <link rel="stylesheet" type="text/css" href="lib/bootmetro-0.6.0/content/css/bootmetro-charms.css">
+    <link rel="stylesheet" type="text/css" href="lib/bootmetro-0.6.0/content/css/metro-ui-light.css">
+    <link rel="stylesheet" type="text/css" href="lib/bootmetro-0.6.0/content/css/icomoon.css">
+
+    <!-- Le fav and touch icons -->
+    <link rel="shortcut icon" href="lib/bootmetro-0.6.0/content/ico/favicon.ico">
+    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="lib/bootmetro-0.6.0/content/ico/apple-touch-icon-144-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="lib/bootmetro-0.6.0/content/ico/apple-touch-icon-114-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="72x72" href="lib/bootmetro-0.6.0/content/ico/apple-touch-icon-72-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" href="lib/bootmetro-0.6.0/content/ico/apple-touch-icon-57-precomposed.png">
+
+    <title>Realtime Chat App</title>
+
+    <style>
+      body {
+        padding: 0;
+        padding-top: 100px;
+        overflow: hidden;
+      }
+
+      .tile {
+        margin-left: auto !important;
+        margin-right: auto !important;
+        float: none !important;
+      }
+
+      #user_pane {
+        position: fixed;
+        top: 0;
+
+        width: 100%;
+        height: 100px;
+        display: none;
+
+        z-index: 10000;
+      }
+
+      #user_pane .tile {
+        height: 100px;
+        width: 100%;
+        background-image: url(lib/bootmetro-0.6.0/content/img/tile-wide.jpg);
+        background-repeat: no-repeat;
+        background-position: center -50px;
+      }
+
+      #user_pane .textover-wrapper {
+        width: 100%;
+        text-align: center;
+      }
+
+      #messages_page {
+        display: none;
+        overflow: auto;
+        height: 410px; /* TODO: calculate this */;
+      }
+
+      #messages {
+      }
+
+      #application_bar {
+        position: fixed;
+        bottom: 0;
+        background-color: white;
+        border-top: solid black 3px;
+        width: 100%;
+      }
+
+      #messages_page .message:nth-child(odd) .tile {
+        background-color: #CD4900 !important;
+      }
+
+      .logged-in-only {
+        display: none !important;
+      }
+
+      .logged-in .logged-in-only {
+        display: inline-block !important;
+      }
+    </style>
+  </head>
+  <body data-accent="blue" class="">
+
+    <div id="login_page" class="container metro">
+      <a class="tile wide app" href="#" id="login">
+        <div class="image-wrapper">
+          <img src="img/twitter.png" alt="">
+        </div>
+        <div class="app-label">Login with Twitter</div>
+        <div class="app-count"></div>
+      </a>
+    </div>
+
+    <div id="user_pane" class="container metro">
+      <a class="tile wide imagetext wideimage" href="#">
+        <div class="textover-wrapper">
+          <h2 id="user_id"></h2>
+        </div>
+      </a>
+    </div>
+
+    <div id="messages_page" class="container metro">
+      <div id="messages"></div>
+    </div>
+
+    <div id="users_pane">
+      <ul id="users">
+      </ul>
+    </div>
+
+    <div id="application_bar">
+      <a class="win-command logged-in-only">
+        <span class="win-commandimage win-commandring">!</span>
+        <span class="win-label">Home</span>
+      </a>
+      <hr class="win-command logged-in-only">
+      <a class="win-command logged-in-only">
+        <span class="win-commandimage win-commandring">_</span>
+        <span class="win-label">Compose</span>
+      </a>
+    </div>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
+    <script src="https://d3dy5gmtp8yhk7.cloudfront.net/2.0/pusher.min.js"></script>
+    <script src='https://realtime-chat-app.azure-mobile.net/client/MobileServices.Web-1.0.0.min.js'></script>
+    <script src="js/config.js"></script>
+
+    <script src="lib/chat/src/chat.js"></script>
+    <script>
+        Pusher.log = function (msg) {
+          console.log(msg);
+        };
+
+        Pusher.channel_auth_endpoint = 'http://localhost:5000/pusher/presence-auth';
+        Pusher.channel_auth_transport = 'jsonp';
+
+        var MobileServiceClient = WindowsAzure.MobileServiceClient,
+            client = new MobileServiceClient('https://realtime-chat-app.azure-mobile.net', 'lTgPlteUxsMalFxwQXtbyaJEKwzucd80'),
+            twitterUser = null;
+
+        var view = {
+            messageAdded: function( message ) {
+              var li = $( '<div class="message"></div>' );
+              li.attr( 'data-uuid', message.uuid );
+
+              var a = $( '<a class="tile wide imagetext" href="#"></a>' );
+              var imgWrapper = $( '<div class="image-wrapper"></div>' );
+              a.append( imgWrapper );
+
+              var img = $( '<img src="lib/bootmetro-0.6.0/content/img/tile-wide-collection-3.gif" alt="">' );
+              imgWrapper.append( img );
+
+              var textCol = $( '<div class="column-text"></div>' );
+              a.append( textCol );
+
+              var text = $( '<div class="text5"></div>' );
+              text.text( message.text );
+              textCol.append( text );
+              
+              li.append( a );
+              li.hide();
+
+              $( '#messages' ).append( li );
+              li.slideDown();
+
+              var scrollTop = $( '#messages_page' ).scrollTop();
+              $( '#messages_page' ).scrollTop( $( '#messages' ).height() );
+                
+            },
+            messageRemoved: function( message ) {
+                $( '#message li[data-uuid=' + message.uuid + ']' )
+                .slideDown( function() {
+                    $( this ).remove();
+                } );
+            },
+            userAdded: function( user ) {
+
+            },
+            userRemoved: function( user ) {
+
+            }
+        };
+
+        $( window ).resize( resize );
+
+        function resize() {
+          var pageHeight = $( document.body ).height() - $( '#application_bar' ).height() - $( '#user_pane' ).height();
+          $( '#messages_page' ).height( pageHeight - 5 );
+        };
+
+        $( '#login' ).click( login );
+
+        function login() {
+
+          client.login('twitter').done( function( user ) {
+            if( user ) {
+              twitterUser = user;
+              $( document.body ).addClass( 'logged-in' );
+              $( '#login_page' ).slideUp( showMessages );
+              startChat();
+            }
+          },
+          function( err ) {
+            console.log( 'error:' );
+            console.log( err );
+          });
+
+        }
+
+        function showMessages() {
+          $( '#user_pane' ).slideDown();
+          $( '#messages_page' ).slideDown();
+        }
+
+        function startChat() {
+          $( '#user_id' ).text( twitterUser.userId );
+          var dataProvider = new DataProvider( twitterUser.userId )
+          var chat = new chatjs.ChatJS( view, dataProvider );
+          resize();
+        }
+        
+        var DataProvider = function( userId ) {
+            var self = this;
+
+            // Connect
+            var options = {
+              encrypted: true,
+              auth: {
+                params: {
+                  user_id: userId
+                }
+              }
+            };
+            var pusher = new Pusher( CONFIG.pusher.appKey, options );
+
+            // Subscribe to chat channel for messages and user events
+            var channel = pusher.subscribe( 'presence-chat' );
+
+            // Messages
+            channel.bind( 'message-added',  messageAdded );
+            channel.bind( 'message-removed',  messageRemoved );
+
+            function messageAdded( message ) {
+              self.notify( 'messageAdded', message );
+            }
+
+            function messageRemoved( message ) {
+              self.notify( 'messageRemoved', message );
+            }
+
+            // Users
+            channel.bind( 'pusher:subscription_succeeded', subscriptionSucceeded );
+            channel.bind( 'pusher:member_added', userAdded );
+            channel.bind( 'pusher:member_removed', userRemoved );
+
+            function subscriptionSucceeded( members ) {
+                members.each( userAdded );
+            }
+
+            function userAdded( user ) {
+                user.uuid = user.id;
+                self.notify( 'userAdded', user );
+            }
+
+            function userRemoved( user ) {
+                user.uuid = user.id;
+                self.notify( 'userRemoved', user );
+            }
+
+            this.addMessage = function( message ) {
+                // TODO: make AJAX request to server
+                throw 'not implemented';
+            };
+
+        };
+
+    </script>
+  </body>
+</html>

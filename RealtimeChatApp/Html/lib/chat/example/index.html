@@ -1,0 +1,96 @@
+<html>
+	<head>
+	</head>
+	<body>
+		<h1>How to use Chat.JS</h1>
+
+		<ul id="messages">
+		<ul>
+
+		<ul id="users">
+		</ul>
+
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
+		<script src="https://d3dy5gmtp8yhk7.cloudfront.net/2.0/pusher.min.js"></script>
+
+		<script src="../src/chat.js"></script>
+		<script>
+			var view = {
+				messageAdded: function( message ) {
+					var li = $( '<li class="message"></li>' );
+					li.attr( 'data-uuid', message.uuid );
+					
+					var user = $( '<span class="display-name">' + message.displayName + '</span>' );
+					li.append( user );
+
+					var text = $( '<div class="text"></div>' );
+					text.text( message.text );
+					li.append( text );
+
+					$( '#messages' ).append( li );
+				},
+				messageRemoved: function( message ) {
+					$( '#message li[data-uuid=' + message.uuid + ']' )
+					.slideDown( function() {
+						$( this ).remove();
+					} );
+				},
+				userAdded: function( user ) {
+
+				},
+				userRemoved: function( user ) {
+
+				}
+			};
+			
+			var dataProvider = new function() {
+				var self = this;
+
+				// Connect
+				var pusher = new Pusher( 'e7d2133b163ece51b34a', { encrypted: true } );
+
+				// Subscribe to chat channel for messages and user events
+				var channel = pusher.subscribe( 'presence-chat' );
+
+				// Messages
+				channel.bind( 'message-added', 		messageAdded );
+				channel.bind( 'message-removed', 	messageRemoved );
+
+				function messageAdded( message ) {
+					self.notify( 'messageAdded', message );
+				}
+
+				function messageRemoved( message ) {
+					self.notify( 'messageRemoved', message );
+				}
+
+				// Users
+				channel.bind( 'pusher:subscription_succeeded', subscriptionSucceeded );
+				channel.bind( 'pusher:member_added', userAdded );
+				channel.bind( 'pusher:member_removed', userRemoved );
+
+				function subscriptionSucceeded( members ) {
+					members.each( userAdded );
+				}
+
+				function userAdded( user ) {
+					user.uuid = user.id;
+					self.notify( 'userAdded', user );
+				}
+
+				function userRemoved( user ) {
+					user.uuid = user.id;
+					self.notify( 'userRemoved', user );
+				}
+
+				this.addMessage = function( message ) {
+					// TODO: make AJAX request to server
+					throw 'not implemented';
+				};
+
+			};
+
+			var chat = new chatjs.ChatJS( view, dataProvider );
+		</script>
+	</body>
+</html>
