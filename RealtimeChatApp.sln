@@ -1,0 +1,38 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RealtimeChatApp", "RealtimeChatApp\RealtimeChatApp.csproj", "{172D71CE-1259-47D3-8A8F-753A6233554A}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Debug|ARM = Debug|ARM
+		Debug|x86 = Debug|x86
+		Release|Any CPU = Release|Any CPU
+		Release|ARM = Release|ARM
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{172D71CE-1259-47D3-8A8F-753A6233554A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{172D71CE-1259-47D3-8A8F-753A6233554A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{172D71CE-1259-47D3-8A8F-753A6233554A}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{172D71CE-1259-47D3-8A8F-753A6233554A}.Debug|ARM.ActiveCfg = Debug|ARM
+		{172D71CE-1259-47D3-8A8F-753A6233554A}.Debug|ARM.Build.0 = Debug|ARM
+		{172D71CE-1259-47D3-8A8F-753A6233554A}.Debug|ARM.Deploy.0 = Debug|ARM
+		{172D71CE-1259-47D3-8A8F-753A6233554A}.Debug|x86.ActiveCfg = Debug|x86
+		{172D71CE-1259-47D3-8A8F-753A6233554A}.Debug|x86.Build.0 = Debug|x86
+		{172D71CE-1259-47D3-8A8F-753A6233554A}.Debug|x86.Deploy.0 = Debug|x86
+		{172D71CE-1259-47D3-8A8F-753A6233554A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{172D71CE-1259-47D3-8A8F-753A6233554A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{172D71CE-1259-47D3-8A8F-753A6233554A}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{172D71CE-1259-47D3-8A8F-753A6233554A}.Release|ARM.ActiveCfg = Release|ARM
+		{172D71CE-1259-47D3-8A8F-753A6233554A}.Release|ARM.Build.0 = Release|ARM
+		{172D71CE-1259-47D3-8A8F-753A6233554A}.Release|ARM.Deploy.0 = Release|ARM
+		{172D71CE-1259-47D3-8A8F-753A6233554A}.Release|x86.ActiveCfg = Release|x86
+		{172D71CE-1259-47D3-8A8F-753A6233554A}.Release|x86.Build.0 = Release|x86
+		{172D71CE-1259-47D3-8A8F-753A6233554A}.Release|x86.Deploy.0 = Release|x86
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
